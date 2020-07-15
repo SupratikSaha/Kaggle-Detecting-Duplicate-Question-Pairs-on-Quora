@@ -21,10 +21,10 @@ for i in range(1, NUM_MODELS):
     df["is_duplicate"] = df["is_duplicate"] + pd.read_csv("predictions/preds" + str(i) + ".csv")["is_duplicate"]
 df["is_duplicate"] /= NUM_MODELS
 
-print("Adjusting predictions considering the different class inbalance ratio...")
+print("Adjusting predictions considering the different class imbalance ratio...")
 a = TEST_TARGET_MEAN / TRAIN_TARGET_MEAN
 b = (1 - TEST_TARGET_MEAN) / (1 - TRAIN_TARGET_MEAN)
-df["is_duplicate"] = df["is_duplicate"].apply(lambda x: a*x / (a*x + b*(1 - x)))
+df["is_duplicate"] = df["is_duplicate"].apply(lambda x: a * x / (a * x + b * (1 - x)))
 
 test_label = np.array(df["is_duplicate"])
 
@@ -76,6 +76,5 @@ for i in range(REPEAT):
 
     print("Updated:", count)
 
-submission = pd.DataFrame({"test_id":df_test["test_id"], "is_duplicate":test_label})
+submission = pd.DataFrame({"test_id": df_test["test_id"], "is_duplicate": test_label})
 submission.to_csv("predictions/submission.csv", index=False)
-
