@@ -1,4 +1,6 @@
 import re
+import nltk
+nltk.download('wordnet')
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
@@ -50,7 +52,7 @@ def preprocess(string):
 
 def get_embedding():
     embeddings_index = {}
-    f = open(EMBEDDING_FILE)
+    f = open(EMBEDDING_FILE,encoding="utf-8")
     for line in f:
         values = line.split()
         word = values[0]
