@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
-NB_CORES = 10
-FREQ_UPPER_BOUND = 100
-NEIGHBOR_UPPER_BOUND = 5
+# NB_CORES = 10
+# FREQ_UPPER_BOUND = 100
+# NEIGHBOR_UPPER_BOUND = 5
 
 
 def create_question_hash(train_df, test_df):
@@ -24,7 +24,7 @@ def get_hash(df, hash_dict):
     return df.drop(["question1", "question2"], axis=1)
 
 
-def get_kcore_dict(df):
+def get_kcore_dict(df, nb_cores):
     g = nx.Graph()
     g.add_nodes_from(df.qid1)
     edges = list(df[["qid1", "qid2"]].to_records(index=False))
@@ -33,7 +33,7 @@ def get_kcore_dict(df):
 
     df_output = pd.DataFrame(data=g.nodes(), columns=["qid"])
     df_output["kcore"] = 0
-    for k in range(2, NB_CORES + 1):
+    for k in range(2, nb_cores + 1):
         ck = nx.k_core(g, k=k).nodes()
         print("kcore", k)
         df_output.ix[df_output.qid.isin(ck), "kcore"] = k
@@ -63,49 +63,60 @@ def get_neighbors(train_df, test_df):
     return neighbors
 
 
-def get_neighbor_features(df, neighbors):
+def get_neighbor_features(df, neighbors, neighbour_upper_bound):
     common_nc = df.apply(lambda x: len(neighbors[x.qid1].intersection(neighbors[x.qid2])), axis=1)
     min_nc = df.apply(lambda x: min(len(neighbors[x.qid1]), len(neighbors[x.qid2])), axis=1)
     df["common_neighbor_ratio"] = common_nc / min_nc
-    df["common_neighbor_count"] = common_nc.apply(lambda x: min(x, NEIGHBOR_UPPER_BOUND))
+    df["common_neighbor_count"] = common_nc.apply(lambda x: min(x, neighbour_upper_bound))
     return df
 
 
-def get_freq_features(df, frequency_map):
-    df["freq1"] = df["qid1"].map(lambda x: min(frequency_map[x], FREQ_UPPER_BOUND))
-    df["freq2"] = df["qid2"].map(lambda x: min(frequency_map[x], FREQ_UPPER_BOUND))
+def get_freq_features(df, frequency_map, freq_upper_bound):
+    df["freq1"] = df["qid1"].map(lambda x: min(frequency_map[x], freq_upper_bound))
+    df["freq2"] = df["qid2"].map(lambda x: min(frequency_map[x], freq_upper_bound))
     return df
 
 
-train_df = pd.read_csv("data/train.csv")
-test_df = pd.read_csv("data/test.csv")
+def non_nlp_feature_extractor(train_df, test_df):
 
-print("Hashing the questions...")
-question_dict = create_question_hash(train_df, test_df)
-train_df = get_hash(train_df, question_dict)
-test_df = get_hash(test_df, question_dict)
-print("Number of unique questions:", len(question_dict))
+    # train_df = pd.read_csv("data/train.csv")
+    # test_df = pd.read_csv("data/test.csv")
 
-print("Calculating kcore features...")
-all_df = pd.concat([train_df, test_df])
-kcore_dict = get_kcore_dict(all_df)
-train_df = get_kcore_features(train_df, kcore_dict)
-test_df = get_kcore_features(test_df, kcore_dict)
-train_df = convert_to_minmax(train_df, "kcore")
-test_df = convert_to_minmax(test_df, "kcore")
+    nb_cores = 10
+    freq_upper_bound = 100
+    neighbour_upper_bound = 5
 
-print("Calculating common neighbor features...")
-neighbors = get_neighbors(train_df, test_df)
-train_df = get_neighbor_features(train_df, neighbors)
-test_df = get_neighbor_features(test_df, neighbors)
+    print("Hashing the questions...")
+    question_dict = create_question_hash(train_df, test_df)
+    train_df = get_hash(train_df, question_dict)
+    test_df = get_hash(test_df, question_dict)
+    print("Number of unique questions:", len(question_dict))
 
-print("Calculating frequency features...")
-frequency_map = dict(zip(*np.unique(np.vstack((all_df["qid1"], all_df["qid2"])), return_counts=True)))
-train_df = get_freq_features(train_df, frequency_map)
-test_df = get_freq_features(test_df, frequency_map)
-train_df = convert_to_minmax(train_df, "freq")
-test_df = convert_to_minmax(test_df, "freq")
+    print("Calculating kcore features...")
+    all_df = pd.concat([train_df, test_df])
+    kcore_dict = get_kcore_dict(all_df, nb_cores)
+    train_df = get_kcore_features(train_df, kcore_dict)
+    test_df = get_kcore_features(test_df, kcore_dict)
+    train_df = convert_to_minmax(train_df, "kcore")
+    test_df = convert_to_minmax(test_df, "kcore")
 
-cols = ["min_kcore", "max_kcore", "common_neighbor_count", "common_neighbor_ratio", "min_freq", "max_freq"]
-train_df.loc[:, cols].to_csv("data/non_nlp_features_train.csv", index=False)
-test_df.loc[:, cols].to_csv("data/non_nlp_features_test.csv", index=False)
+    print("Calculating common neighbor features...")
+    neighbors = get_neighbors(train_df, test_df)
+    train_df = get_neighbor_features(train_df, neighbors, neighbour_upper_bound)
+    test_df = get_neighbor_features(test_df, neighbors, neighbour_upper_bound)
+
+    print("Calculating frequency features...")
+    frequency_map = dict(zip(*np.unique(np.vstack((all_df["qid1"], all_df["qid2"])), return_counts=True)))
+    train_df = get_freq_features(train_df, frequency_map, freq_upper_bound)
+    test_df = get_freq_features(test_df, frequency_map, freq_upper_bound)
+    train_df = convert_to_minmax(train_df, "freq")
+    test_df = convert_to_minmax(test_df, "freq")
+
+    cols = ["min_kcore", "max_kcore", "common_neighbor_count", "common_neighbor_ratio", "min_freq", "max_freq"]
+    # train_df.loc[:, cols].to_csv("data/non_nlp_features_train.csv", index=False)
+    # test_df.loc[:, cols].to_csv("data/non_nlp_features_test.csv", index=False)
+
+    train_df = train_df.loc[:, cols]
+    test_df = test_df.loc[:, cols]
+
+    return train_df, test_df
