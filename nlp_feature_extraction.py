@@ -123,7 +123,8 @@ def extract_features(df: pd.DataFrame, safe_div: float, stop_words: Set[str]) ->
     return df
 
 
-def nlp_feature_extractor(df_train: pd.DataFrame, df_test: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def nlp_feature_extractor(df_train: pd.DataFrame,
+                          df_test: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """ Main function that extract nlp features from train and test data sets
         Args:
             df_train: DataFrame for Training data
