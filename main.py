@@ -21,6 +21,6 @@ test_non_nlp_feats_df.to_csv("data/non_nlp_features_test.csv", index=False)
 # Run model
 run_lstm_with_embeddings(df_train, df_test)
 
-# Post process model predictions
+# Post process model predictions and create submission file
 submission = post_process_results(df_train, df_test)
 submission.to_csv("predictions/submission.csv", index=False)
