@@ -92,7 +92,7 @@ def convert_to_minmax(df: pd.DataFrame, col: str) -> pd.DataFrame:
     return df.drop([col + "1", col + "2"], axis=1)
 
 
-def get_neighbors(train_df: pd.DataFrame, test_df: pd.DataFrame) -> Dict[int, int]:
+def get_neighbors(train_df: pd.DataFrame, test_df: pd.DataFrame) -> defaultdict[int, set]:
     """ Computes a dictionary of neighbour set of all questions that a given question is linked to
         Args:
             train_df: DataFrame for Training data
@@ -109,7 +109,8 @@ def get_neighbors(train_df: pd.DataFrame, test_df: pd.DataFrame) -> Dict[int, in
     return neighbors
 
 
-def get_neighbor_features(df: pd.DataFrame, neighbors: Dict[int, int], neighbour_upper_bound: int) -> pd.DataFrame:
+def get_neighbor_features(df: pd.DataFrame, neighbors: defaultdict[int, set],
+                          neighbour_upper_bound: int) -> pd.DataFrame:
     """ Computes common neighbor ratio and common neighbor count for each question pair
         Args:
             df: Train or test DataFrame
@@ -126,7 +127,8 @@ def get_neighbor_features(df: pd.DataFrame, neighbors: Dict[int, int], neighbour
     return df
 
 
-def get_freq_features(df, frequency_map, freq_upper_bound):
+def get_freq_features(df: pd.DataFrame, frequency_map: Dict[str, int],
+                      freq_upper_bound: int) -> pd.DataFrame:
     """ Computes minimum and maximum frequency for each question pair
         Args:
             df: Train or test DataFrame
@@ -141,7 +143,8 @@ def get_freq_features(df, frequency_map, freq_upper_bound):
     return df
 
 
-def non_nlp_feature_extractor(train_df: pd.DataFrame, test_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def non_nlp_feature_extractor(train_df: pd.DataFrame,
+                              test_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """ Main function that extract nlp features from train and test data sets
         Args:
             train_df: DataFrame for Training data
