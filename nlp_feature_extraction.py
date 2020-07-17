@@ -1,14 +1,20 @@
+""" Code file to extract nlp features from the questions """
+
 import re
-# import pandas as pd
+import pandas as pd
+from typing import List, Tuple
 from nltk.corpus import stopwords
 from fuzzywuzzy import fuzz
 import distance
 
-# SAFE_DIV = 0.0001
-# STOP_WORDS = stopwords.words("english")
 
-
-def preprocess(x):
+def pre_process(x):
+    """ Pre process question strings for abbreviations and numbers
+        Args:
+            x: question string that is to be pre processed
+        Returns:
+            Returns a pre processed string
+    """
     x = str(x).lower()
     x = x.replace(",000,000", "m").replace(",000", "k").replace("′", "'").replace("’", "'") \
         .replace("won't", "will not").replace("cannot", "can not").replace("can't", "can not") \
@@ -22,7 +28,16 @@ def preprocess(x):
     return x
 
 
-def get_token_features(q1, q2, safe_div, stop_words):
+def get_token_features(q1: str, q2: str, safe_div: float, stop_words: set) -> List:
+    """ Computes a list of token features for two question strings
+            Args:
+                q1: String fro question 1
+                q2: String for question 2
+                safe_div: A small float to avoid division by zero
+                stop_words: set of nltk stop words
+            Returns:
+                A list of token features for two question strings
+    """
     token_features = [0.0] * 10
 
     q1_tokens = q1.split()
@@ -54,7 +69,14 @@ def get_token_features(q1, q2, safe_div, stop_words):
     return token_features
 
 
-def get_longest_substr_ratio(a, b):
+def get_longest_substr_ratio(a: str, b: str) -> float:
+    """ Computes the ration of longest common substring length and the length of the smaller string
+        Args:
+            a: String for question 1
+            b: String for question 2
+        Returns:
+            Returns longest common substring ration for two question strings
+    """
     strs = list(distance.lcsubstrings(a, b))
     if len(strs) == 0:
         return 0
@@ -62,9 +84,19 @@ def get_longest_substr_ratio(a, b):
         return len(strs[0]) / (min(len(a), len(b)) + 1)
 
 
-def extract_features(df, safe_div, stop_words):
-    df["question1"] = df["question1"].fillna("").apply(preprocess)
-    df["question2"] = df["question2"].fillna("").apply(preprocess)
+def extract_features(df: pd.DataFrame, safe_div: float, stop_words: set) -> pd.DataFrame:
+    """ Helper function to extract nlp features from one given data sets
+            Args:
+                df: Train or test DataFrame from which nlp features are to be extracted
+                safe_div: small float value to bypass division by zero
+                stop_words: Set of english stop words from nltk
+
+            Returns:
+                Input DataFrame with columns added fro nlp features
+    """
+
+    df["question1"] = df["question1"].fillna("").apply(pre_process)
+    df["question2"] = df["question2"].fillna("").apply(pre_process)
 
     print("token features...")
     token_features = df.apply(lambda x: get_token_features(
@@ -89,20 +121,23 @@ def extract_features(df, safe_div, stop_words):
     return df
 
 
-def nlp_feature_extractor(df_train, df_test):
+def nlp_feature_extractor(df_train: pd.DataFrame, df_test: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """ Main function that extract nlp features from train and test data sets
+        Args:
+            df_train: DataFrame for Training data
+            df_test: DataFrame for Test data
+        Returns:
+            Tuple of training and test DataFrames with nlp feature columns
+    """
     safe_div = 0.0001
     stop_words = stopwords.words("english")
 
     print("Extracting features for train:")
-    # train_df = pd.read_csv("data/train.csv")
     train_df = extract_features(df_train, safe_div, stop_words)
     train_df.drop(["id", "qid1", "qid2", "question1", "question2", "is_duplicate"], axis=1, inplace=True)
-    # train_df.to_csv("data/nlp_features_train.csv", index=False)
 
     print("Extracting features for test:")
-    # test_df = pd.read_csv("data/test.csv")
     test_df = extract_features(df_test, safe_div, stop_words)
     test_df.drop(["test_id", "question1", "question2"], axis=1, inplace=True)
-    # test_df.to_csv("data/nlp_features_test.csv", index=False)
 
     return train_df, test_df
