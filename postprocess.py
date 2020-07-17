@@ -1,9 +1,18 @@
+""" Code file to post process model predictions """
+
 from collections import defaultdict
 import numpy as np
 import pandas as pd
 
 
-def post_process_results(df_train, df_test):
+def post_process_results(df_train: pd.DataFrame, df_test: pd.DataFrame) -> pd.DataFrame:
+    """ Function that post processes model predictions by considering class imbalance ratio and duplicates
+        Args:
+            df_train: DataFrame for Training data
+            df_test: DataFrame for Test data
+        Returns:
+            Post process DataFrame od test data set predictions ready for submission
+    """
     num_models = 10
     train_target_mean = 0.37
     test_target_mean = 0.16
@@ -14,10 +23,7 @@ def post_process_results(df_train, df_test):
     dup_upper_bound = 0.98
     not_dup_upper_bound = 0.01
 
-    # df_train = pd.read_csv("data/train.csv")
-    # df_test = pd.read_csv("data/test.csv")
-
-    print("Average Ensembling...")
+    print("Average Ensembling")
     df = pd.read_csv("predictions/preds0.csv")
     for i in range(1, num_models):
         df["is_duplicate"] = df["is_duplicate"] + \
@@ -82,4 +88,3 @@ def post_process_results(df_train, df_test):
     submission = pd.DataFrame({"test_id": df_test["test_id"], "is_duplicate": test_label})
 
     return submission
-    # submission.to_csv("predictions/submission.csv", index=False)
