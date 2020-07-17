@@ -2,13 +2,13 @@
 
 import re
 import pandas as pd
-from typing import List, Tuple
+from typing import List, Tuple, Set
 from nltk.corpus import stopwords
 from fuzzywuzzy import fuzz
 import distance
 
 
-def pre_process(x):
+def pre_process(x: str) -> str:
     """ Pre process question strings for abbreviations and numbers
         Args:
             x: question string that is to be pre processed
@@ -25,13 +25,14 @@ def pre_process(x):
         .replace("€", " euro ").replace("'ll", " will")
     x = re.sub(r"([0-9]+)000000", r"\1m", x)
     x = re.sub(r"([0-9]+)000", r"\1k", x)
+
     return x
 
 
-def get_token_features(q1: str, q2: str, safe_div: float, stop_words: set) -> List:
+def get_token_features(q1: str, q2: str, safe_div: float, stop_words: Set[str]) -> List[float]:
     """ Computes a list of token features for two question strings
             Args:
-                q1: String fro question 1
+                q1: String for question 1
                 q2: String for question 2
                 safe_div: A small float to avoid division by zero
                 stop_words: set of nltk stop words
@@ -66,6 +67,7 @@ def get_token_features(q1: str, q2: str, safe_div: float, stop_words: set) -> Li
     token_features[7] = int(q1_tokens[0] == q2_tokens[0])
     token_features[8] = abs(len(q1_tokens) - len(q2_tokens))
     token_features[9] = (len(q1_tokens) + len(q2_tokens)) / 2
+
     return token_features
 
 
@@ -77,14 +79,14 @@ def get_longest_substr_ratio(a: str, b: str) -> float:
         Returns:
             Returns longest common substring ration for two question strings
     """
-    strs = list(distance.lcsubstrings(a, b))
-    if len(strs) == 0:
+    strings = list(distance.lcsubstrings(a, b))
+    if len(strings) == 0:
         return 0
     else:
-        return len(strs[0]) / (min(len(a), len(b)) + 1)
+        return len(strings[0]) / (min(len(a), len(b)) + 1)
 
 
-def extract_features(df: pd.DataFrame, safe_div: float, stop_words: set) -> pd.DataFrame:
+def extract_features(df: pd.DataFrame, safe_div: float, stop_words: Set[str]) -> pd.DataFrame:
     """ Helper function to extract nlp features from one given data sets
             Args:
                 df: Train or test DataFrame from which nlp features are to be extracted
@@ -94,7 +96,6 @@ def extract_features(df: pd.DataFrame, safe_div: float, stop_words: set) -> pd.D
             Returns:
                 Input DataFrame with columns added fro nlp features
     """
-
     df["question1"] = df["question1"].fillna("").apply(pre_process)
     df["question2"] = df["question2"].fillna("").apply(pre_process)
 
@@ -118,6 +119,7 @@ def extract_features(df: pd.DataFrame, safe_div: float, stop_words: set) -> pd.D
     df["fuzz_ratio"] = df.apply(lambda x: fuzz.QRatio(x["question1"], x["question2"]), axis=1)
     df["fuzz_partial_ratio"] = df.apply(lambda x: fuzz.partial_ratio(x["question1"], x["question2"]), axis=1)
     df["longest_substr_ratio"] = df.apply(lambda x: get_longest_substr_ratio(x["question1"], x["question2"]), axis=1)
+
     return df
 
 
