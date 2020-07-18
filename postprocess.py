@@ -87,4 +87,10 @@ def post_process_results(df_train: pd.DataFrame, df_test: pd.DataFrame) -> pd.Da
 
     submission = pd.DataFrame({"test_id": df_test["test_id"], "is_duplicate": test_label})
 
-    return submission
+    # Make sure we have the correct ids
+    submission_final = submission[submission['test_id'].apply(lambda x: isinstance(x, (int, np.int64)))]
+
+    # Average out values if there are ids with multiple values
+    submission_final = submission_final.groupby('test_id', as_index=False).mean()
+
+    return submission_final
