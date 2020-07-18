@@ -1,13 +1,13 @@
 """ Code file to extract non-nlp features from the questions """
 
-from typing import Dict, Tuple
+from typing import Dict, Mapping, Tuple
 from collections import defaultdict
 import numpy as np
 import pandas as pd
 import networkx as nx
 
 
-def create_question_hash(train_df: pd.DataFrame, test_df: pd.DataFrame) -> Dict[int, str]:
+def create_question_hash(train_df: pd.DataFrame, test_df: pd.DataFrame) -> Mapping[int, str]:
     """ Creates a hash set of all non duplicate questions from train and test set
         Args:
             train_df: DataFrame for Training data
@@ -25,7 +25,7 @@ def create_question_hash(train_df: pd.DataFrame, test_df: pd.DataFrame) -> Dict[
     return question_dict
 
 
-def get_hash(df: pd.DataFrame, hash_dict: Dict[int, str]) -> pd.DataFrame:
+def get_hash(df: pd.DataFrame, hash_dict: Mapping[int, str]) -> pd.DataFrame:
     """ Replaces questions in the DataFrame by their hash indexes
             Args:
                 df: Training or Test DataFrame
