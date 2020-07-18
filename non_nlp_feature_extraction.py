@@ -92,7 +92,7 @@ def convert_to_minmax(df: pd.DataFrame, col: str) -> pd.DataFrame:
     return df.drop([col + "1", col + "2"], axis=1)
 
 
-def get_neighbors(train_df: pd.DataFrame, test_df: pd.DataFrame) -> defaultdict[int, set]:
+def get_neighbors(train_df: pd.DataFrame, test_df: pd.DataFrame) -> Dict[int, set]:
     """ Computes a dictionary of neighbour set of all questions that a given question is linked to
         Args:
             train_df: DataFrame for Training data
@@ -109,7 +109,7 @@ def get_neighbors(train_df: pd.DataFrame, test_df: pd.DataFrame) -> defaultdict[
     return neighbors
 
 
-def get_neighbor_features(df: pd.DataFrame, neighbors: defaultdict[int, set],
+def get_neighbor_features(df: pd.DataFrame, neighbors: Dict[int, set],
                           neighbour_upper_bound: int) -> pd.DataFrame:
     """ Computes common neighbor ratio and common neighbor count for each question pair
         Args:
