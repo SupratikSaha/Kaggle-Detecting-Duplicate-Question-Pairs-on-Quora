@@ -43,12 +43,12 @@ Download the glove vector into project directory [Pre-Trained Glove Word Vector]
  
 ## Running Code
 
-Run the \_\_main__.py file. It is advised to run the code in pieces. For reference, it took me about about 2 days on my HP Spectre i5
+Run the \_\_main__.py file. It is advised to run the code in pieces. For reference, it took me about 2 days on my HP Spectre i5
 
 # Model
 
 - Model uses in total 25 nlp and non-nlp features
 - A 10-fold validation strategy was used
-- A Glove embedding vector and an LSTM model was used to get predictions
+- A Glove embedding vector and a LSTM model was used to get predictions
 - Rare words in questions were replaced by an invalid word indicator "memento"
 - Average ensembling is used to derive final model predictions

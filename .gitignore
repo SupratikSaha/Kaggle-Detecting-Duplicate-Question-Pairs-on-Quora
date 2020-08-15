@@ -1,0 +1,9 @@
+*.h5
+.idea/
+__pycache__/
+data/
+predictions/
+images/model.png
+readme/
+LICENSE.md
+glove.840B.300d.txt
