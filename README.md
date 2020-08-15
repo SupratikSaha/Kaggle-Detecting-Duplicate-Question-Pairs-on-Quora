@@ -11,7 +11,7 @@ and 0.13264 on the public leader board
 
 On the private leader board this translates to a rank of 38 out of 3304 submissions 
 
-This ranks in about top 1% of submissions
+This ranks within top 1% of submissions
 
 ![My Submission](images/kaggle_submission_score.jpg)
 
