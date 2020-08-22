@@ -1,4 +1,4 @@
-# Kaggle Quora Question Pairs Competition Solution - Top 1% Private Leader Board
+# Kaggle Quora Question Pairs Competition Solution
 
 ## Kaggle Competition link
 
@@ -6,12 +6,8 @@ https://www.kaggle.com/c/quora-question-pairs
 
 ## Submission Details
 
-My submission had a log loss score of 0.13499 on the private leader board 
+The submission had a log loss score of 0.13499 on the private leader board 
 and 0.13264 on the public leader board
-
-On the private leader board this translates to a rank of 38 out of 3304 submissions 
-
-This ranks within top 1% of submissions
 
 ![My Submission](images/kaggle_submission_score.jpg)
 
