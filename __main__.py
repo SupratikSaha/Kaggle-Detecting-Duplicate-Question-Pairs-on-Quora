@@ -2,10 +2,10 @@
 
 import pandas as pd
 import nltk
-from nlp_feature_extraction import nlp_feature_extractor
-from non_nlp_feature_extraction import non_nlp_feature_extractor
-from model import run_lstm_with_embeddings
-from postprocess import post_process_results
+from pre_process_nlp_features import nlp_feature_extractor
+from pre_process_non_nlp_features import non_nlp_feature_extractor
+from train import run_lstm_with_embeddings
+from post_process import post_process_results
 
 # Train and test data frames
 df_train = pd.read_csv("data/train.csv")
