@@ -15,15 +15,15 @@ and 0.13264 on the public leader board
 
 ## Packages to be installed
 
-Following packages specified in requirements.txt file need to be installed
-Distance==0.1.3
-fuzzywuzzy==0.17.0
-keras==2.2.4
-networkx==1.11
-nltk==3.4
-numpy==1.16.2
-pandas==0.24.2
-scikit-learn==0.22.2.post1
+Following packages specified in requirements.txt file need to be installed - 
+Distance,
+fuzzywuzzy, 
+keras, 
+networkx, 
+nltk, 
+numpy, 
+pandas and 
+scikit-learn
 
 ## Folders needed to run code
 
