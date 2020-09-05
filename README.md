@@ -9,8 +9,6 @@ https://www.kaggle.com/c/quora-question-pairs
 The submission had a log loss score of 0.13499 on the private leader board 
 and 0.13264 on the public leader board
 
-![My Submission](images/kaggle_submission_score.jpg)
-
 # Steps to run project code
 
 ## Packages to be installed
